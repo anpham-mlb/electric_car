@@ -9,5 +9,6 @@ df["Efficiency"] = df["Efficiency"].apply(lambda i: i.split(" Wh/km")[0])
 df["FastChargeSpeed"] = df["FastChargeSpeed"].apply(lambda i: i.split(" km/h")[0] if i != "-" else "")
 df["PriceinGermany"] = df["PriceinGermany"].str.extract(r"(\d.*)")
 df["PriceinUK"] = df["PriceinUK"].str.extract(r"(\d.*)")
+df["Brand"] = df["Name"].apply(lambda i: i.split(" ")[0])
 
 df.to_csv("clean_electricity_car.csv", index = False)
