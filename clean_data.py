@@ -137,4 +137,5 @@ def price(val0, val1):
 df["PriceinAUS Metric"] = ""
 df["PriceinAUS Metric"] = df[["PriceinAUS", "PriceinAUS Metric"]].apply(lambda i: price(i[0], i[1]), axis = 1)
 
-df.to_csv("clean_electricity_car.csv", index = False)
+# print(df["Name"].value_counts())
+# df.to_csv("clean_electricity_car.csv", index = False)
