@@ -137,5 +137,13 @@ def price(val0, val1):
 df["PriceinAUS Metric"] = ""
 df["PriceinAUS Metric"] = df[["PriceinAUS", "PriceinAUS Metric"]].apply(lambda i: price(i[0], i[1]), axis = 1)
 
-# print(df["Name"].value_counts())
-# df.to_csv("clean_electricity_car.csv", index = False)
+# Remove duplicated data
+df = df.reset_index(drop = True)
+duplicated_data = df[df["Name"].isin([
+    "Hyundai Kona Electric 64 kWh", "Hyundai Kona Electric 39 kWh", "Audi e-tron Sportback 55 quattro",
+    "Tesla Model 3 Long Range Dual Motor", "Audi e-tron 55 quattro", "Kia e-Soul 64 kWh"])].index.tolist()
+df = df.drop(duplicated_data, axis = 0)
+
+# print(duplicated_data)
+# print(df["Name"].value_counts().iloc[0:6])
+df.to_csv("clean_electricity_car.csv", index = False)
