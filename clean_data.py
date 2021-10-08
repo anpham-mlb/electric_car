@@ -146,4 +146,4 @@ df = df.drop(duplicated_data, axis = 0)
 
 # print(duplicated_data)
 # print(df["Name"].value_counts().iloc[0:6])
-df.to_csv("clean_electricity_car.csv", index = False)
+# df.to_csv("clean_electricity_car.csv", index = False)
