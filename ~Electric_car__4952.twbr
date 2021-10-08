@@ -1,11 +1,12 @@
 <?xml version='1.0' encoding='utf-8' ?>
 
 <!-- build 20204.21.0217.1203                               -->
-<workbook original-version='18.1' source-build='2020.4.2 (20204.21.0217.1203)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+<workbook source-build='2020.4.2 (20204.21.0217.1203)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
   <document-format-change-manifest>
     <AutoCreateAndUpdateDSDPhoneLayouts />
     <_.fcp.MarkAnimation.true...MarkAnimation />
     <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelExtractV2.true...ObjectModelExtractV2 />
     <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
     <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
     <_.fcp.SetMembershipControl.true...SetMembershipControl />
@@ -27,7 +28,7 @@
       <connection class='federated'>
         <named-connections>
           <named-connection caption='clean_electricity_car' name='textscan.1ucnobh10ulish1bpuygv1ezzhdt'>
-            <connection class='textscan' directory='C:/Users/cheahph/OneDrive - OneWorkplace/Desktop/Data/electric_car' filename='clean_electricity_car.csv' password='' server='' />
+            <connection class='textscan' directory='C:/Users/cheahph/OneDrive - OneWorkplace/Desktop/Electric Car/electric_car' filename='clean_electricity_car.csv' password='' server='' />
           </named-connection>
         </named-connections>
         <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='textscan.1ucnobh10ulish1bpuygv1ezzhdt' name='clean_electricity_car.csv' table='[clean_electricity_car#csv]' type='table'>
@@ -351,11 +352,26 @@
       <aliases enabled='yes' />
       <column datatype='real' name='[Acceleration]' role='measure' type='quantitative' />
       <column datatype='string' name='[Brand]' role='dimension' type='nominal' />
-      <column caption='Total Metric' datatype='integer' name='[Calculation_1418915383017791488]' role='measure' type='quantitative'>
+      <column caption='No of cars' datatype='integer' name='[Calculation_1268326270788567040]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='{FIXED [Brand] : COUNT([Name])}' />
+      </column>
+      <column caption='Brand total metric' datatype='integer' name='[Calculation_1268326270796812289]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='{FIXED [Brand] : SUM([Calculation_1418915383017791488])}' />
+      </column>
+      <column caption='Average Metric' datatype='real' name='[Calculation_1268326270798585858]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='([Calculation_1268326270796812289]/[Calculation_1268326270788567040])/7' />
+      </column>
+      <column caption='Car total metric' datatype='integer' name='[Calculation_1418915383017791488]' role='measure' type='quantitative'>
         <calculation class='tableau' formula='([Acceleration Metric] + [Efficiency Metric] + [FastChargeSpeed Metric] + [PriceinAUS Metric]&#13;&#10;+ [Range Metric] + [Subtitle Metric] + [TopSpeed Metric])' />
       </column>
-      <column caption='Set Colour' datatype='string' name='[Calculation_1418915383070511105]' role='dimension' type='nominal'>
-        <calculation class='tableau' formula='IF [Calculation_1418915383017791488] &gt;= 3 THEN &quot;colour1&quot; &#13;&#10;ELSEIF 3 &gt; [Calculation_1418915383017791488] and [Calculation_1418915383017791488] &gt;= 2.75 then &quot;colour2&quot;&#13;&#10;ELSEIF 2.75 &gt; [Calculation_1418915383017791488] and [Calculation_1418915383017791488] &gt;= 2.69 THEN &quot;colour3&quot;&#13;&#10;ELSEIF 2.69 &gt; [Calculation_1418915383017791488] and [Calculation_1418915383017791488] &gt;= 1 THEN &quot;colour4&quot;&#13;&#10;END' />
+      <column caption='Classify Car' datatype='string' name='[Calculation_1418915383070511105]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='IF [Calculation_1268326270798585858] &gt;= 3 THEN &quot;High Score&quot; &#13;&#10;ELSEIF 3 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 2.69 then &quot;Good Score&quot;&#13;&#10;ELSEIF 2.69 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 2.1 THEN &quot;Average Score&quot;&#13;&#10;ELSEIF 2.1 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 0 THEN &quot;Bad Score&quot;&#13;&#10;END' />
+      </column>
+      <column caption='Brand total price' datatype='real' name='[Calculation_348466047152185344]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='{FIXED [Brand] : SUM([PriceinAUS])}' />
+      </column>
+      <column caption='Brand average price' datatype='real' name='[Calculation_348466047152328705]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='[Calculation_348466047152185344]/[Calculation_1268326270788567040]' />
       </column>
       <column caption='Fast Charge Speed' datatype='real' name='[FastChargeSpeed]' role='measure' type='quantitative' />
       <column datatype='string' name='[Name]' role='dimension' type='nominal' />
@@ -446,7 +462,14 @@
           </groupfilter>
         </groupfilter>
       </group>
-      <group caption='Top 3 price_brands' name='[Top 3 price_brands]' name-style='unqualified' user:ui-builder='filter-group'>
+      <group caption='Top 3 price_brands L' name='[Top 3 price_brands H (copy)]' name-style='unqualified' user:ui-builder='filter-group'>
+        <groupfilter count='3' end='bottom' function='end' units='records' user:ui-marker='end' user:ui-top-by-field='true'>
+          <groupfilter direction='DESC' expression='AVG([PriceinAUS])' function='order' user:ui-marker='order'>
+            <groupfilter function='level-members' level='[Brand]' user:ui-enumeration='all' user:ui-marker='enumerate' />
+          </groupfilter>
+        </groupfilter>
+      </group>
+      <group caption='Top 3 price_brands H' name='[Top 3 price_brands]' name-style='unqualified' user:ui-builder='filter-group'>
         <groupfilter count='3' end='top' function='end' units='records' user:ui-marker='end' user:ui-top-by-field='true'>
           <groupfilter direction='DESC' expression='AVG([PriceinAUS])' function='order' user:ui-marker='order'>
             <groupfilter function='level-members' level='[Brand]' user:ui-enumeration='all' user:ui-marker='enumerate' />
@@ -474,6 +497,300 @@
           </groupfilter>
         </groupfilter>
       </group>
+      <extract _.fcp.ObjectModelExtractV2.true...object-id='' count='-1' enabled='true' units='records'>
+        <connection access_mode='readonly' authentication='auth-none' author-locale='en_US' class='hyper' dbname='C:/Users/cheahph/OneDrive - OneWorkplace/Documents/My Tableau Repository/Data Extracts/clean_electricity_car (2).hyper' default-settings='yes' schema='Extract' sslmode='' tablename='Extract' update-time='10/08/2021 06:12:39 AM' username='tableau_internal_user'>
+          <_.fcp.ObjectModelEncapsulateLegacy.false...relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <_.fcp.ObjectModelEncapsulateLegacy.true...relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <refresh>
+            <refresh-event add-from-file-path='clean_electricity_car (2)' increment-value='%null%' refresh-type='create' rows-inserted='168' timestamp-start='2021-10-08 06:12:39.034' />
+          </refresh>
+          <metadata-records>
+            <metadata-record class='column'>
+              <remote-name>Name</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[Name]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Name</remote-alias>
+              <ordinal>0</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>168</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Subtitle</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[Subtitle]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Subtitle</remote-alias>
+              <ordinal>1</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>60</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Acceleration</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[Acceleration]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Acceleration</remote-alias>
+              <ordinal>2</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>77</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>TopSpeed</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[TopSpeed]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>TopSpeed</remote-alias>
+              <ordinal>3</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>34</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Range</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[Range]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Range</remote-alias>
+              <ordinal>4</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>67</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Efficiency</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[Efficiency]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Efficiency</remote-alias>
+              <ordinal>5</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>77</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>FastChargeSpeed</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[FastChargeSpeed]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>FastChargeSpeed</remote-alias>
+              <ordinal>6</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>66</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Drive</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[Drive]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Drive</remote-alias>
+              <ordinal>7</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>3</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>NumberofSeats</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[NumberofSeats]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>NumberofSeats</remote-alias>
+              <ordinal>8</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>4</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>PriceinGermany</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[PriceinGermany]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>PriceinGermany</remote-alias>
+              <ordinal>9</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>145</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>PriceinUK</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[PriceinUK]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>PriceinUK</remote-alias>
+              <ordinal>10</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>119</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Brand</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[Brand]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Brand</remote-alias>
+              <ordinal>11</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>37</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RGB' />
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>PriceinAUS</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[PriceinAUS]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>PriceinAUS</remote-alias>
+              <ordinal>12</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>119</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Subtitle Metric</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[Subtitle Metric]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Subtitle Metric</remote-alias>
+              <ordinal>13</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>4</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Acceleration Metric</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[Acceleration Metric]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Acceleration Metric</remote-alias>
+              <ordinal>14</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>5</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Range Metric</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[Range Metric]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Range Metric</remote-alias>
+              <ordinal>15</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>5</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>TopSpeed Metric</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[TopSpeed Metric]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>TopSpeed Metric</remote-alias>
+              <ordinal>16</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>5</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Efficiency Metric</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[Efficiency Metric]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Efficiency Metric</remote-alias>
+              <ordinal>17</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>5</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>FastChargeSpeed Metric</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[FastChargeSpeed Metric]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>FastChargeSpeed Metric</remote-alias>
+              <ordinal>18</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>5</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>PriceinAUS Metric</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[PriceinAUS Metric]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>PriceinAUS Metric</remote-alias>
+              <ordinal>19</ordinal>
+              <family>clean_electricity_car.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>6</approx-count>
+              <contains-null>true</contains-null>
+              <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[clean_electricity_car.csv_31B7F0FADEA44395BF0618155AC4B9DA]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+            </metadata-record>
+          </metadata-records>
+        </connection>
+      </extract>
       <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
       <style>
         <style-rule element='mark'>
@@ -591,16 +908,31 @@
             </map>
           </encoding>
           <encoding attr='color' field='[none:Calculation_1418915383070511105:nk]' type='palette'>
-            <map to='#4e79a7'>
+            <map to='#0077c8'>
               <bucket>&quot;colour1&quot;</bucket>
             </map>
-            <map to='#76b7b2'>
-              <bucket>&quot;colour4&quot;</bucket>
-            </map>
-            <map to='#e15759'>
+            <map to='#00ac48'>
               <bucket>&quot;colour3&quot;</bucket>
             </map>
+            <map to='#3a2143'>
+              <bucket>&quot;colour4&quot;</bucket>
+            </map>
+            <map to='#4e79a7'>
+              <bucket>&quot;Average Score&quot;</bucket>
+            </map>
+            <map to='#59a14f'>
+              <bucket>%null%</bucket>
+            </map>
+            <map to='#76b7b2'>
+              <bucket>&quot;High Score&quot;</bucket>
+            </map>
+            <map to='#e15759'>
+              <bucket>&quot;Good Score&quot;</bucket>
+            </map>
             <map to='#f28e2b'>
+              <bucket>&quot;Bad Score&quot;</bucket>
+            </map>
+            <map to='#f38a22'>
               <bucket>&quot;colour2&quot;</bucket>
             </map>
           </encoding>
@@ -638,6 +970,9 @@
                   <column datatype='integer' name='PriceinAUS Metric' ordinal='19' />
                 </columns>
               </relation>
+            </properties>
+            <properties context='extract'>
+              <relation name='Extract' table='[Extract].[Extract]' type='table' />
             </properties>
           </object>
         </objects>
@@ -875,6 +1210,237 @@
       </table>
       <simple-id uuid='{EA70D3E1-1A96-4E71-BEE6-B7459D44D0A8}' />
     </worksheet>
+    <worksheet name='High Avg Acceleration'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='clean_electricity_car (2)' name='federated.1gocl1t1wmtbiq1h8a2lv00la0ta' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1gocl1t1wmtbiq1h8a2lv00la0ta'>
+            <column datatype='integer' name='[Acceleration Metric]' role='measure' type='quantitative' />
+            <column datatype='real' name='[Acceleration]' role='measure' type='quantitative' />
+            <column datatype='string' name='[Brand]' role='dimension' type='nominal' />
+            <column caption='No of cars' datatype='integer' name='[Calculation_1268326270788567040]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [Brand] : COUNT([Name])}' />
+            </column>
+            <column caption='Brand total metric' datatype='integer' name='[Calculation_1268326270796812289]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [Brand] : SUM([Calculation_1418915383017791488])}' />
+            </column>
+            <column caption='Average Metric' datatype='real' name='[Calculation_1268326270798585858]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='([Calculation_1268326270796812289]/[Calculation_1268326270788567040])/7' />
+            </column>
+            <column caption='Car total metric' datatype='integer' name='[Calculation_1418915383017791488]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='([Acceleration Metric] + [Efficiency Metric] + [FastChargeSpeed Metric] + [PriceinAUS Metric]&#13;&#10;+ [Range Metric] + [Subtitle Metric] + [TopSpeed Metric])' />
+            </column>
+            <column caption='Classify Car' datatype='string' name='[Calculation_1418915383070511105]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [Calculation_1268326270798585858] &gt;= 3 THEN &quot;High Score&quot; &#13;&#10;ELSEIF 3 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 2.69 then &quot;Good Score&quot;&#13;&#10;ELSEIF 2.69 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 2.1 THEN &quot;Average Score&quot;&#13;&#10;ELSEIF 2.1 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 0 THEN &quot;Bad Score&quot;&#13;&#10;END' />
+            </column>
+            <column datatype='integer' name='[Efficiency Metric]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[FastChargeSpeed Metric]' role='measure' type='quantitative' />
+            <column datatype='string' name='[Name]' role='dimension' type='nominal' />
+            <column datatype='integer' name='[PriceinAUS Metric]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[Range Metric]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[Subtitle Metric]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[TopSpeed Metric]' role='measure' type='quantitative' />
+            <column-instance column='[Acceleration]' derivation='Avg' name='[avg:Acceleration:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_1418915383070511105]' derivation='None' name='[none:Calculation_1418915383070511105:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Calculation_1418915383070511105:nk]'>
+            <groupfilter function='member' level='[none:Calculation_1418915383070511105:nk]' member='&quot;High Score&quot;' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+          </filter>
+          <slices>
+            <column>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Calculation_1418915383070511105:nk]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='text-format' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:Acceleration:qk]' value='n#,##0.00&quot; s&quot;;-#,##0.00&quot; s&quot;' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <text column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:Acceleration:qk]' />
+            </encodings>
+            <customized-label>
+              <formatted-text>
+                <run fontalignment='0' fontcolor='#666666'>Top Speed</run>
+                <run fontalignment='0'>Æ&#10;</run>
+                <run fontalignment='0' fontcolor='#666666' fontsize='12'><![CDATA[<[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:Acceleration:qk]>]]></run>
+              </formatted-text>
+            </customized-label>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-cull' value='true' />
+                <format attr='mark-labels-show' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{5D83617D-60A3-47CC-A628-3851FB0D4EE6}' />
+    </worksheet>
+    <worksheet name='High Avg Price'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='clean_electricity_car (2)' name='federated.1gocl1t1wmtbiq1h8a2lv00la0ta' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1gocl1t1wmtbiq1h8a2lv00la0ta'>
+            <column datatype='integer' name='[Acceleration Metric]' role='measure' type='quantitative' />
+            <column datatype='string' name='[Brand]' role='dimension' type='nominal' />
+            <column caption='No of cars' datatype='integer' name='[Calculation_1268326270788567040]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [Brand] : COUNT([Name])}' />
+            </column>
+            <column caption='Brand total metric' datatype='integer' name='[Calculation_1268326270796812289]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [Brand] : SUM([Calculation_1418915383017791488])}' />
+            </column>
+            <column caption='Average Metric' datatype='real' name='[Calculation_1268326270798585858]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='([Calculation_1268326270796812289]/[Calculation_1268326270788567040])/7' />
+            </column>
+            <column caption='Car total metric' datatype='integer' name='[Calculation_1418915383017791488]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='([Acceleration Metric] + [Efficiency Metric] + [FastChargeSpeed Metric] + [PriceinAUS Metric]&#13;&#10;+ [Range Metric] + [Subtitle Metric] + [TopSpeed Metric])' />
+            </column>
+            <column caption='Classify Car' datatype='string' name='[Calculation_1418915383070511105]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [Calculation_1268326270798585858] &gt;= 3 THEN &quot;High Score&quot; &#13;&#10;ELSEIF 3 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 2.69 then &quot;Good Score&quot;&#13;&#10;ELSEIF 2.69 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 2.1 THEN &quot;Average Score&quot;&#13;&#10;ELSEIF 2.1 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 0 THEN &quot;Bad Score&quot;&#13;&#10;END' />
+            </column>
+            <column datatype='integer' name='[Efficiency Metric]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[FastChargeSpeed Metric]' role='measure' type='quantitative' />
+            <column datatype='string' name='[Name]' role='dimension' type='nominal' />
+            <column datatype='integer' name='[PriceinAUS Metric]' role='measure' type='quantitative' />
+            <column caption='Pricein AUS' datatype='real' name='[PriceinAUS]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[Range Metric]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[Subtitle Metric]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[TopSpeed Metric]' role='measure' type='quantitative' />
+            <column-instance column='[PriceinAUS]' derivation='Avg' name='[avg:PriceinAUS:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_1418915383070511105]' derivation='None' name='[none:Calculation_1418915383070511105:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Calculation_1418915383070511105:nk]'>
+            <groupfilter function='member' level='[none:Calculation_1418915383070511105:nk]' member='&quot;High Score&quot;' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+          </filter>
+          <slices>
+            <column>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Calculation_1418915383070511105:nk]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='text-format' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:PriceinAUS:qk]' value='c&quot;$&quot;#,##0;-&quot;$&quot;#,##0' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <text column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:PriceinAUS:qk]' />
+            </encodings>
+            <customized-label>
+              <formatted-text>
+                <run fontalignment='0' fontcolor='#666666'>Price</run>
+                <run fontalignment='0'>Æ&#10;</run>
+                <run fontalignment='0' fontcolor='#666666' fontsize='12'><![CDATA[<[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:PriceinAUS:qk]>]]></run>
+              </formatted-text>
+            </customized-label>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-cull' value='true' />
+                <format attr='mark-labels-show' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{F1DEF897-D12C-4685-9550-4718CA2B6037}' />
+    </worksheet>
+    <worksheet name='High Avg Speed'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='clean_electricity_car (2)' name='federated.1gocl1t1wmtbiq1h8a2lv00la0ta' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1gocl1t1wmtbiq1h8a2lv00la0ta'>
+            <column datatype='integer' name='[Acceleration Metric]' role='measure' type='quantitative' />
+            <column datatype='string' name='[Brand]' role='dimension' type='nominal' />
+            <column caption='No of cars' datatype='integer' name='[Calculation_1268326270788567040]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [Brand] : COUNT([Name])}' />
+            </column>
+            <column caption='Brand total metric' datatype='integer' name='[Calculation_1268326270796812289]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [Brand] : SUM([Calculation_1418915383017791488])}' />
+            </column>
+            <column caption='Average Metric' datatype='real' name='[Calculation_1268326270798585858]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='([Calculation_1268326270796812289]/[Calculation_1268326270788567040])/7' />
+            </column>
+            <column caption='Car total metric' datatype='integer' name='[Calculation_1418915383017791488]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='([Acceleration Metric] + [Efficiency Metric] + [FastChargeSpeed Metric] + [PriceinAUS Metric]&#13;&#10;+ [Range Metric] + [Subtitle Metric] + [TopSpeed Metric])' />
+            </column>
+            <column caption='Classify Car' datatype='string' name='[Calculation_1418915383070511105]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [Calculation_1268326270798585858] &gt;= 3 THEN &quot;High Score&quot; &#13;&#10;ELSEIF 3 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 2.69 then &quot;Good Score&quot;&#13;&#10;ELSEIF 2.69 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 2.1 THEN &quot;Average Score&quot;&#13;&#10;ELSEIF 2.1 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 0 THEN &quot;Bad Score&quot;&#13;&#10;END' />
+            </column>
+            <column datatype='integer' name='[Efficiency Metric]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[FastChargeSpeed Metric]' role='measure' type='quantitative' />
+            <column datatype='string' name='[Name]' role='dimension' type='nominal' />
+            <column datatype='integer' name='[PriceinAUS Metric]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[Range Metric]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[Subtitle Metric]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[TopSpeed Metric]' role='measure' type='quantitative' />
+            <column caption='Top Speed' datatype='real' name='[TopSpeed]' role='measure' type='quantitative' />
+            <column-instance column='[TopSpeed]' derivation='Avg' name='[avg:TopSpeed:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_1418915383070511105]' derivation='None' name='[none:Calculation_1418915383070511105:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Calculation_1418915383070511105:nk]'>
+            <groupfilter function='member' level='[none:Calculation_1418915383070511105:nk]' member='&quot;High Score&quot;' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+          </filter>
+          <slices>
+            <column>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Calculation_1418915383070511105:nk]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='text-format' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:TopSpeed:qk]' value='n#,##0.00&quot; km/h&quot;;-#,##0.00&quot; km/h&quot;' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <text column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:TopSpeed:qk]' />
+            </encodings>
+            <customized-label>
+              <formatted-text>
+                <run fontalignment='0' fontcolor='#666666'>Top Speed</run>
+                <run fontalignment='0'>Æ&#10;</run>
+                <run fontalignment='0' fontcolor='#666666' fontsize='12'><![CDATA[<[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:TopSpeed:qk]>]]></run>
+              </formatted-text>
+            </customized-label>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-cull' value='true' />
+                <format attr='mark-labels-show' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{BABFDAC0-DA34-43E1-94C9-270FFEF7A63F}' />
+    </worksheet>
     <worksheet name='Score distribution'>
       <table>
         <view>
@@ -884,11 +1450,20 @@
           <datasource-dependencies datasource='federated.1gocl1t1wmtbiq1h8a2lv00la0ta'>
             <column datatype='integer' name='[Acceleration Metric]' role='measure' type='quantitative' />
             <column datatype='string' name='[Brand]' role='dimension' type='nominal' />
-            <column caption='Total Metric' datatype='integer' name='[Calculation_1418915383017791488]' role='measure' type='quantitative'>
+            <column caption='No of cars' datatype='integer' name='[Calculation_1268326270788567040]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [Brand] : COUNT([Name])}' />
+            </column>
+            <column caption='Brand total metric' datatype='integer' name='[Calculation_1268326270796812289]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [Brand] : SUM([Calculation_1418915383017791488])}' />
+            </column>
+            <column caption='Average Metric' datatype='real' name='[Calculation_1268326270798585858]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='([Calculation_1268326270796812289]/[Calculation_1268326270788567040])/7' />
+            </column>
+            <column caption='Car total metric' datatype='integer' name='[Calculation_1418915383017791488]' role='measure' type='quantitative'>
               <calculation class='tableau' formula='([Acceleration Metric] + [Efficiency Metric] + [FastChargeSpeed Metric] + [PriceinAUS Metric]&#13;&#10;+ [Range Metric] + [Subtitle Metric] + [TopSpeed Metric])' />
             </column>
-            <column caption='Set Colour' datatype='string' name='[Calculation_1418915383070511105]' role='dimension' type='nominal'>
-              <calculation class='tableau' formula='IF [Calculation_1418915383017791488] &gt;= 3 THEN &quot;colour1&quot; &#13;&#10;ELSEIF 3 &gt; [Calculation_1418915383017791488] and [Calculation_1418915383017791488] &gt;= 2.75 then &quot;colour2&quot;&#13;&#10;ELSEIF 2.75 &gt; [Calculation_1418915383017791488] and [Calculation_1418915383017791488] &gt;= 2.69 THEN &quot;colour3&quot;&#13;&#10;ELSEIF 2.69 &gt; [Calculation_1418915383017791488] and [Calculation_1418915383017791488] &gt;= 1 THEN &quot;colour4&quot;&#13;&#10;END' />
+            <column caption='Classify Car' datatype='string' name='[Calculation_1418915383070511105]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [Calculation_1268326270798585858] &gt;= 3 THEN &quot;High Score&quot; &#13;&#10;ELSEIF 3 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 2.69 then &quot;Good Score&quot;&#13;&#10;ELSEIF 2.69 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 2.1 THEN &quot;Average Score&quot;&#13;&#10;ELSEIF 2.1 &gt; [Calculation_1268326270798585858] and [Calculation_1268326270798585858] &gt;= 0 THEN &quot;Bad Score&quot;&#13;&#10;END' />
             </column>
             <column datatype='integer' name='[Efficiency Metric]' role='measure' type='quantitative' />
             <column datatype='integer' name='[FastChargeSpeed Metric]' role='measure' type='quantitative' />
@@ -897,29 +1472,27 @@
             <column datatype='integer' name='[Range Metric]' role='measure' type='quantitative' />
             <column datatype='integer' name='[Subtitle Metric]' role='measure' type='quantitative' />
             <column datatype='integer' name='[TopSpeed Metric]' role='measure' type='quantitative' />
-            <column-instance column='[Name]' derivation='Count' name='[cnt:Name:qk]' pivot='key' type='quantitative' />
             <column-instance column='[Brand]' derivation='None' name='[none:Brand:nk]' pivot='key' type='nominal' />
             <column-instance column='[Calculation_1418915383070511105]' derivation='None' name='[none:Calculation_1418915383070511105:nk]' pivot='key' type='nominal' />
-            <column-instance column='[Calculation_1418915383017791488]' derivation='Sum' name='[sum:Calculation_1418915383017791488:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_1268326270798585858]' derivation='Sum' name='[sum:Calculation_1268326270798585858:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[PriceinAUS Metric]' derivation='Sum' name='[sum:PriceinAUS Metric:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
-          <computed-sort column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]' direction='DESC' using='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1418915383017791488:qk]' />
-          <filter class='categorical' column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Calculation_1418915383070511105:nk]'>
-            <groupfilter from='&quot;colour1&quot;' function='range' level='[none:Calculation_1418915383070511105:nk]' to='&quot;colour4&quot;' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
-          </filter>
+          <computed-sort column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]' direction='DESC' using='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1268326270798585858:qk]' />
+          <filter class='quantitative' column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1268326270798585858:qk]' included-values='non-null' />
           <slices>
-            <column>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Calculation_1418915383070511105:nk]</column>
+            <column>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1268326270798585858:qk]</column>
           </slices>
           <aggregation value='true' />
         </view>
         <style>
           <style-rule element='axis'>
+            <format attr='display' class='0' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1268326270798585858:qk]' scope='rows' value='false' />
             <format attr='stroke-size' value='0' />
             <format attr='line-visibility' value='off' />
             <format attr='tick-color' value='#00000000' />
-            <format attr='display' class='0' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1418915383017791488:qk]' scope='rows' value='false' />
           </style-rule>
-          <style-rule element='label'>
-            <format attr='text-orientation' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[cnt:Name:qk]' value='-90' />
+          <style-rule element='cell'>
+            <format attr='text-format' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1268326270798585858:qk]' value='n#,##0.00;-#,##0.00' />
           </style-rule>
           <style-rule element='worksheet'>
             <format attr='display-field-labels' scope='cols' value='false' />
@@ -950,14 +1523,14 @@
             <mark-sizing mark-sizing-setting='marks-scaling-off' />
             <encodings>
               <color column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Calculation_1418915383070511105:nk]' />
-              <text column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1418915383017791488:qk]' />
-              <text column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[cnt:Name:qk]' />
+              <tooltip column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:PriceinAUS Metric:qk]' />
+              <text column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1268326270798585858:qk]' />
             </encodings>
             <style>
               <style-rule element='mark'>
                 <format attr='size' value='0.77961325645446777' />
-                <format attr='mark-labels-show' value='true' />
                 <format attr='mark-labels-cull' value='true' />
+                <format attr='mark-labels-show' value='true' />
               </style-rule>
               <style-rule element='trendline'>
                 <format attr='stroke-size' value='0' />
@@ -966,10 +1539,80 @@
             </style>
           </pane>
         </panes>
-        <rows>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1418915383017791488:qk]</rows>
+        <rows>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1268326270798585858:qk]</rows>
         <cols>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]</cols>
       </table>
       <simple-id uuid='{BED804EC-C84E-4E4F-9D96-ECE6333392F9}' />
+    </worksheet>
+    <worksheet name='Sheet 23'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='clean_electricity_car (2)' name='federated.1gocl1t1wmtbiq1h8a2lv00la0ta' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1gocl1t1wmtbiq1h8a2lv00la0ta'>
+            <column datatype='string' name='[Brand]' role='dimension' type='nominal' />
+            <column caption='No of cars' datatype='integer' name='[Calculation_1268326270788567040]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [Brand] : COUNT([Name])}' />
+            </column>
+            <column caption='Brand total price' datatype='real' name='[Calculation_348466047152185344]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='{FIXED [Brand] : SUM([PriceinAUS])}' />
+            </column>
+            <column caption='Brand average price' datatype='real' name='[Calculation_348466047152328705]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='[Calculation_348466047152185344]/[Calculation_1268326270788567040]' />
+            </column>
+            <column datatype='string' name='[Name]' role='dimension' type='nominal' />
+            <column datatype='integer' name='[PriceinAUS Metric]' role='measure' type='quantitative' />
+            <column caption='Pricein AUS' datatype='real' name='[PriceinAUS]' role='measure' type='quantitative' />
+            <column-instance column='[PriceinAUS]' derivation='Avg' name='[avg:PriceinAUS:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Name]' derivation='Count' name='[cnt:Name:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Brand]' derivation='None' name='[none:Brand:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Name]' derivation='None' name='[none:Name:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_1268326270788567040]' derivation='Sum' name='[sum:Calculation_1268326270788567040:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Calculation_348466047152185344]' derivation='Sum' name='[sum:Calculation_348466047152185344:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Calculation_348466047152328705]' derivation='Sum' name='[sum:Calculation_348466047152328705:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[PriceinAUS Metric]' derivation='Sum' name='[sum:PriceinAUS Metric:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[PriceinAUS]' derivation='Sum' name='[sum:PriceinAUS:ok]' pivot='key' type='ordinal' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]'>
+            <groupfilter function='union' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate'>
+              <groupfilter function='member' level='[none:Brand:nk]' member='&quot;Lucid&quot;' />
+              <groupfilter function='member' level='[none:Brand:nk]' member='&quot;Porsche&quot;' />
+              <groupfilter function='member' level='[none:Brand:nk]' member='&quot;Tesla&quot;' />
+            </groupfilter>
+          </filter>
+          <slices>
+            <column>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='cell'>
+            <format attr='width' value='107' />
+          </style-rule>
+          <style-rule element='header'>
+            <format attr='width' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]' value='248' />
+            <format attr='width' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:PriceinAUS Metric:ok]' value='108' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <style>
+              <style-rule element='pane'>
+                <format attr='minwidth' value='-1' />
+                <format attr='maxwidth' value='-1' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>([federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk] / ([federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk] / ([federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:PriceinAUS Metric:ok] / ([federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:PriceinAUS:ok] / ([federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_1268326270788567040:ok] / ([federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_348466047152185344:ok] / ([federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[sum:Calculation_348466047152328705:ok] / ([federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[cnt:Name:ok] / [federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:PriceinAUS:ok]))))))))</rows>
+        <cols />
+      </table>
+      <simple-id uuid='{8763A804-E0A7-428E-8949-73E7DFBBE822}' />
     </worksheet>
     <worksheet name='Test colour'>
       <table>
@@ -1012,6 +1655,10 @@
             <column-instance column='[Name]' derivation='None' name='[none:Name:nk]' pivot='key' type='nominal' />
             <column-instance column='[PriceinAUS]' derivation='Sum' name='[sum:PriceinAUS:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
+          <filter class='categorical' column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]' />
+          <slices>
+            <column>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]</column>
+          </slices>
           <aggregation value='true' />
         </view>
         <style>
@@ -1681,7 +2328,7 @@
       </table>
       <simple-id uuid='{345DCF08-AB85-4DCE-AA31-B03CCB4476BD}' />
     </worksheet>
-    <worksheet name='Top 3 car_price'>
+    <worksheet name='Top 3 car_price H'>
       <table>
         <view>
           <datasources>
@@ -1782,6 +2429,108 @@
         <cols>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:PriceinAUS:qk]</cols>
       </table>
       <simple-id uuid='{BA781C1A-6F9B-4DB7-9BCE-D2FAA7706348}' />
+    </worksheet>
+    <worksheet name='Top 3 car_price L'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='clean_electricity_car (2)' name='federated.1gocl1t1wmtbiq1h8a2lv00la0ta' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1gocl1t1wmtbiq1h8a2lv00la0ta'>
+            <column datatype='string' name='[Brand]' role='dimension' type='nominal' />
+            <column caption='Pricein AUS' datatype='real' name='[PriceinAUS]' role='measure' type='quantitative' />
+            <column-instance column='[PriceinAUS]' derivation='Avg' name='[avg:PriceinAUS:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Brand]' derivation='None' name='[none:Brand:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3 price_brands]' />
+          <computed-sort column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]' direction='DESC' using='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:PriceinAUS:qk]' />
+          <slices>
+            <column>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3 price_brands]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='axis'>
+            <format attr='display' class='0' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:PriceinAUS:qk]' scope='cols' value='false' />
+            <format attr='stroke-size' value='0' />
+            <format attr='line-visibility' value='off' />
+            <format attr='tick-color' value='#00000000' />
+          </style-rule>
+          <style-rule element='cell'>
+            <format attr='text-format' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:PriceinAUS:qk]' value='c&quot;$&quot;#,##0,K;-&quot;$&quot;#,##0,K' />
+          </style-rule>
+          <style-rule element='header'>
+            <format attr='border-width' data-class='total' value='0' />
+            <format attr='border-style' data-class='total' value='none' />
+            <format attr='width' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]' value='56' />
+          </style-rule>
+          <style-rule element='field-labels'>
+            <format attr='color' value='#666666' />
+            <format attr='font-size' value='11' />
+            <format attr='font-weight' value='bold' />
+          </style-rule>
+          <style-rule element='label'>
+            <format attr='text-align' field='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]' value='left' />
+          </style-rule>
+          <style-rule element='pane'>
+            <format attr='border-width' data-class='total' value='0' />
+            <format attr='border-style' data-class='total' value='none' />
+          </style-rule>
+          <style-rule element='worksheet'>
+            <format attr='display-field-labels' scope='rows' value='false' />
+          </style-rule>
+          <style-rule element='dropline'>
+            <format attr='stroke-size' value='0' />
+            <format attr='line-visibility' value='off' />
+          </style-rule>
+          <style-rule element='refline'>
+            <format attr='stroke-size' value='0' />
+            <format attr='line-visibility' value='off' />
+          </style-rule>
+          <style-rule element='gridline'>
+            <format attr='stroke-size' scope='cols' value='0' />
+            <format attr='line-visibility' scope='cols' value='off' />
+          </style-rule>
+          <style-rule element='zeroline'>
+            <format attr='stroke-size' value='0' />
+            <format attr='line-visibility' value='off' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <text column='[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:PriceinAUS:qk]' />
+            </encodings>
+            <customized-label>
+              <formatted-text>
+                <run fontsize='8'>&lt;</run>
+                <run fontsize='8'>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:PriceinAUS:qk]</run>
+                <run fontsize='8'>&gt;</run>
+              </formatted-text>
+            </customized-label>
+            <style>
+              <style-rule element='mark'>
+                <format attr='size' value='0.92254143953323364' />
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+                <format attr='mark-color' value='#0077c8' />
+              </style-rule>
+              <style-rule element='trendline'>
+                <format attr='stroke-size' value='0' />
+                <format attr='line-visibility' value='off' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]</rows>
+        <cols>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[avg:PriceinAUS:qk]</cols>
+      </table>
+      <simple-id uuid='{705380B0-F812-49C5-910A-44988B6D1754}' />
     </worksheet>
     <worksheet name='Top 3 car_range'>
       <table>
@@ -2217,8 +2966,8 @@
                           <format attr='margin' value='0' />
                         </zone-style>
                       </zone>
-                      <zone fixed-size='143' h='4285' id='23' is-fixed='true' name='The cheapest car_' show-title='false' w='15385' x='20538' y='18285'>
-                        <layout-cache cell-count-w='1' type-h='fixed' type-w='cell' />
+                      <zone h='3071' id='23' name='The cheapest car_' show-title='false' w='15385' x='20538' y='18285'>
+                        <layout-cache cell-count-w='1' fixed-size-h='43' type-h='fixed' type-w='cell' />
                         <zone-style>
                           <format attr='border-color' value='#000000' />
                           <format attr='border-style' value='none' />
@@ -2239,7 +2988,7 @@
                           <format attr='margin' value='0' />
                         </zone-style>
                       </zone>
-                      <zone h='4285' id='26' name='Top 3 car_price' show-title='false' w='12076' x='35923' y='18285'>
+                      <zone h='4285' id='26' name='Top 3 car_price H' show-title='false' w='12076' x='35923' y='18285'>
                         <layout-cache fixed-size-h='60' minwidth='156' type-h='fixed' type-w='scalable' />
                         <zone-style>
                           <format attr='border-color' value='#000000' />
@@ -2757,8 +3506,8 @@
                     <format attr='margin' value='4' />
                   </zone-style>
                 </zone>
-                <zone _.fcp.SetMembershipControl.false...type='layout-flow' _.fcp.SetMembershipControl.true...type-v2='layout-flow' h='87071' id='105' param='vert' w='45695' x='51229' y='7714'>
-                  <zone _.fcp.SetMembershipControl.false...type='text' _.fcp.SetMembershipControl.true...type-v2='text' fixed-size='45' h='3714' id='106' is-fixed='true' w='45695' x='51229' y='7714'>
+                <zone _.fcp.SetMembershipControl.false...type='layout-flow' _.fcp.SetMembershipControl.true...type-v2='layout-flow' h='87071' id='105' param='vert' w='45675' x='51229' y='7714'>
+                  <zone _.fcp.SetMembershipControl.false...type='text' _.fcp.SetMembershipControl.true...type-v2='text' fixed-size='45' h='3714' id='106' is-fixed='true' w='45675' x='51229' y='7714'>
                     <formatted-text>
                       <run bold='true' fontsize='14'>Score Distribution</run>
                     </formatted-text>
@@ -2770,8 +3519,20 @@
                       <format attr='margin-top' value='7' />
                     </zone-style>
                   </zone>
-                  <zone fixed-size='298' h='21857' id='107' is-fixed='true' name='Score distribution' show-title='false' w='45695' x='51229' y='11428'>
+                  <zone fixed-size='298' h='21857' id='107' is-fixed='true' name='Score distribution' show-title='false' w='45675' x='51229' y='11428'>
                     <layout-cache cell-count-w='29' minheight='180' type-h='scalable' type-w='cell' />
+                    <zone-style>
+                      <format attr='border-color' value='#000000' />
+                      <format attr='border-style' value='none' />
+                      <format attr='border-width' value='0' />
+                      <format attr='margin' value='4' />
+                      <format attr='margin-left' value='10' />
+                    </zone-style>
+                  </zone>
+                  <zone _.fcp.SetMembershipControl.false...type='text' _.fcp.SetMembershipControl.true...type-v2='text' fixed-size='44' h='3714' id='115' is-fixed='true' w='45675' x='51229' y='33285'>
+                    <formatted-text>
+                      <run bold='true' fontsize='14'>Score Explanation</run>
+                    </formatted-text>
                     <zone-style>
                       <format attr='border-color' value='#000000' />
                       <format attr='border-style' value='none' />
@@ -2779,8 +3540,84 @@
                       <format attr='margin' value='4' />
                     </zone-style>
                   </zone>
-                  <zone _.fcp.SetMembershipControl.false...type='layout-flow' _.fcp.SetMembershipControl.true...type-v2='layout-flow' h='5072' id='112' param='horz' w='45695' x='51229' y='33285' />
-                  <zone _.fcp.SetMembershipControl.false...type='empty' _.fcp.SetMembershipControl.true...type-v2='empty' fixed-size='782' h='56428' id='109' is-fixed='true' w='45695' x='51229' y='38357'>
+                  <zone _.fcp.SetMembershipControl.false...type='layout-flow' _.fcp.SetMembershipControl.true...type-v2='layout-flow' h='2857' id='117' param='horz' w='45675' x='51229' y='36999'>
+                    <zone _.fcp.SetMembershipControl.false...type='bitmap' _.fcp.SetMembershipControl.true...type-v2='bitmap' fixed-size='40' h='2857' id='123' is-fixed='true' is-scaled='1' param='C:/Users/cheahph/OneDrive - OneWorkplace/Desktop/Electric Car/electric_car/Icon/happiness.png' w='3077' x='51229' y='36999'>
+                      <zone-style>
+                        <format attr='border-color' value='#000000' />
+                        <format attr='border-style' value='none' />
+                        <format attr='border-width' value='0' />
+                        <format attr='margin' value='0' />
+                      </zone-style>
+                    </zone>
+                    <zone _.fcp.SetMembershipControl.false...type='text' _.fcp.SetMembershipControl.true...type-v2='text' fixed-size='90' forceUpdate='true' h='2857' id='119' is-fixed='true' w='7538' x='54306' y='36999'>
+                      <formatted-text>
+                        <run bold='true' fontcolor='#0077c8' fontsize='11'>Great Score</run>
+                      </formatted-text>
+                      <zone-style>
+                        <format attr='border-color' value='#000000' />
+                        <format attr='border-style' value='none' />
+                        <format attr='border-width' value='0' />
+                        <format attr='margin' value='4' />
+                      </zone-style>
+                    </zone>
+                  </zone>
+                  <zone _.fcp.SetMembershipControl.false...type='layout-flow' _.fcp.SetMembershipControl.true...type-v2='layout-flow' fixed-size='107' h='7643' id='124' is-fixed='true' param='horz' w='45675' x='51229' y='39856'>
+                    <zone _.fcp.SetMembershipControl.false...type='empty' _.fcp.SetMembershipControl.true...type-v2='empty' fixed-size='5' h='7643' id='126' is-fixed='true' w='1000' x='51229' y='39856'>
+                      <zone-style>
+                        <format attr='border-color' value='#000000' />
+                        <format attr='border-style' value='none' />
+                        <format attr='border-width' value='0' />
+                        <format attr='margin' value='4' />
+                      </zone-style>
+                    </zone>
+                    <zone _.fcp.SetMembershipControl.false...type='empty' _.fcp.SetMembershipControl.true...type-v2='empty' fixed-size='14' h='7643' id='127' is-fixed='true' w='1077' x='52229' y='39856'>
+                      <zone-style>
+                        <format attr='border-color' value='#000000' />
+                        <format attr='border-style' value='none' />
+                        <format attr='border-width' value='0' />
+                        <format attr='margin' value='0' />
+                        <format attr='background-color' value='#e6e6e6' />
+                      </zone-style>
+                    </zone>
+                    <zone _.fcp.SetMembershipControl.false...type='empty' _.fcp.SetMembershipControl.true...type-v2='empty' fixed-size='5' h='7643' id='128' is-fixed='true' w='1000' x='53306' y='39856'>
+                      <zone-style>
+                        <format attr='border-color' value='#000000' />
+                        <format attr='border-style' value='none' />
+                        <format attr='border-width' value='0' />
+                        <format attr='margin' value='4' />
+                      </zone-style>
+                    </zone>
+                    <zone _.fcp.SetMembershipControl.false...type='layout-flow' _.fcp.SetMembershipControl.true...type-v2='layout-flow' fixed-size='114' h='7643' id='130' is-fixed='true' param='horz' w='8769' x='54306' y='39856'>
+                      <zone h='3357' id='131' name='High Avg Price' show-title='false' w='8769' x='54306' y='39856'>
+                        <layout-cache fixed-size-h='39' fixed-size-w='80' type-h='fixed' type-w='fixed' />
+                        <zone-style>
+                          <format attr='border-color' value='#000000' />
+                          <format attr='border-style' value='none' />
+                          <format attr='border-width' value='0' />
+                          <format attr='margin' value='4' />
+                        </zone-style>
+                      </zone>
+                    </zone>
+                    <zone fixed-size='114' h='7643' id='132' is-fixed='true' name='High Avg Speed' show-title='false' w='9384' x='63075' y='39856'>
+                      <layout-cache fixed-size-h='39' type-h='fixed' type-w='fixed' />
+                      <zone-style>
+                        <format attr='border-color' value='#000000' />
+                        <format attr='border-style' value='none' />
+                        <format attr='border-width' value='0' />
+                        <format attr='margin' value='4' />
+                      </zone-style>
+                    </zone>
+                    <zone fixed-size='97' h='7643' id='133' is-fixed='true' name='High Avg Acceleration' show-title='false' w='8077' x='72459' y='39856'>
+                      <layout-cache fixed-size-h='39' type-h='fixed' type-w='fixed' />
+                      <zone-style>
+                        <format attr='border-color' value='#000000' />
+                        <format attr='border-style' value='none' />
+                        <format attr='border-width' value='0' />
+                        <format attr='margin' value='4' />
+                      </zone-style>
+                    </zone>
+                  </zone>
+                  <zone _.fcp.SetMembershipControl.false...type='empty' _.fcp.SetMembershipControl.true...type-v2='empty' fixed-size='457' h='33214' id='109' is-fixed='true' w='45675' x='51229' y='47499'>
                     <zone-style>
                       <format attr='border-color' value='#000000' />
                       <format attr='border-style' value='none' />
@@ -2810,10 +3647,10 @@
       </zones>
       <devicelayouts>
         <devicelayout auto-generated='true' name='Phone'>
-          <size maxheight='3050' minheight='3050' sizing-mode='vscroll' />
+          <size maxheight='3250' minheight='3250' sizing-mode='vscroll' />
           <zones>
-            <zone _.fcp.SetMembershipControl.false...type='layout-basic' _.fcp.SetMembershipControl.true...type-v2='layout-basic' h='100000' id='114' w='100000' x='0' y='0'>
-              <zone _.fcp.SetMembershipControl.false...type='layout-flow' _.fcp.SetMembershipControl.true...type-v2='layout-flow' h='98858' id='113' param='vert' w='98770' x='615' y='571'>
+            <zone _.fcp.SetMembershipControl.false...type='layout-basic' _.fcp.SetMembershipControl.true...type-v2='layout-basic' h='100000' id='122' w='100000' x='0' y='0'>
+              <zone _.fcp.SetMembershipControl.false...type='layout-flow' _.fcp.SetMembershipControl.true...type-v2='layout-flow' h='98858' id='121' param='vert' w='98770' x='615' y='571'>
                 <zone _.fcp.SetMembershipControl.false...type='text' _.fcp.SetMembershipControl.true...type-v2='text' fixed-size='55' forceUpdate='true' h='3929' id='9' w='93848' x='3076' y='571'>
                   <formatted-text>
                     <run bold='true' fontsize='20'>Industry at a Glance</run>
@@ -2937,8 +3774,8 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='60' h='4285' id='23' is-fixed='true' name='The cheapest car_' show-title='false' w='15385' x='20538' y='18285'>
-                  <layout-cache cell-count-w='1' type-h='fixed' type-w='cell' />
+                <zone fixed-size='43' h='3071' id='23' is-fixed='true' name='The cheapest car_' show-title='false' w='15385' x='20538' y='18285'>
+                  <layout-cache cell-count-w='1' fixed-size-h='43' type-h='fixed' type-w='cell' />
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -2947,7 +3784,7 @@
                     <format attr='padding' value='0' />
                   </zone-style>
                 </zone>
-                <zone fixed-size='60' h='4285' id='26' is-fixed='true' name='Top 3 car_price' show-title='false' w='12076' x='35923' y='18285'>
+                <zone fixed-size='60' h='4285' id='26' is-fixed='true' name='Top 3 car_price H' show-title='false' w='12076' x='35923' y='18285'>
                   <layout-cache fixed-size-h='60' minwidth='156' type-h='fixed' type-w='scalable' />
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -3034,6 +3871,30 @@
                 </zone>
                 <zone fixed-size='60' h='4285' id='47' is-fixed='true' name='Top 3 car_speed' show-title='false' w='12076' x='35923' y='33283'>
                   <layout-cache fixed-size-h='60' minwidth='156' type-h='fixed' type-w='scalable' />
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone _.fcp.SetMembershipControl.false...type='text' _.fcp.SetMembershipControl.true...type-v2='text' fixed-size='44' h='3714' id='115' w='45695' x='51229' y='33285'>
+                  <formatted-text>
+                    <run bold='true' fontsize='14'>Score Explanation</run>
+                  </formatted-text>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone _.fcp.SetMembershipControl.false...type='text' _.fcp.SetMembershipControl.true...type-v2='text' forceUpdate='true' h='3071' id='119' w='42388' x='54536' y='36999'>
+                  <formatted-text>
+                    <run bold='true' fontcolor='#0077c8' fontsize='11'>Great Score</run>
+                  </formatted-text>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -3268,7 +4129,7 @@
                   </zone-style>
                 </zone>
                 <zone fixed-size='43' h='3071' id='84' is-fixed='true' name='The highest capacity_car' show-title='false' w='17462' x='3076' y='78277'>
-                  <layout-cache cell-count-w='1' type-h='fixed' type-w='cell' />
+                  <layout-cache cell-count-w='1' fixed-size-h='43' type-h='fixed' type-w='cell' />
                   <zone-style>
                     <format attr='border-color' value='#000000' />
                     <format attr='border-style' value='none' />
@@ -3312,7 +4173,7 @@
     </dashboard>
   </dashboards>
   <windows source-height='30'>
-    <window class='dashboard' maximized='true' name='Dashboard 1'>
+    <window class='dashboard' name='Dashboard 1'>
       <viewpoints>
         <viewpoint name='Average Acceleration'>
           <zoom type='entire-view' />
@@ -3329,6 +4190,9 @@
         <viewpoint name='Average Subtitle'>
           <zoom type='entire-view' />
         </viewpoint>
+        <viewpoint name='High Avg Acceleration' />
+        <viewpoint name='High Avg Price' />
+        <viewpoint name='High Avg Speed' />
         <viewpoint name='Score distribution'>
           <zoom type='entire-view' />
         </viewpoint>
@@ -3365,7 +4229,7 @@
         <viewpoint name='Top 3 car_acceleration'>
           <zoom type='fit-width' />
         </viewpoint>
-        <viewpoint name='Top 3 car_price'>
+        <viewpoint name='Top 3 car_price H'>
           <zoom type='fit-width' />
         </viewpoint>
         <viewpoint name='Top 3 car_range'>
@@ -3378,7 +4242,7 @@
           <zoom type='fit-width' />
         </viewpoint>
       </viewpoints>
-      <active id='-1' />
+      <active id='26' />
       <simple-id uuid='{C5913FD7-DCC6-4E0F-8F20-F7D8E320F397}' />
     </window>
     <window class='worksheet' name='Test colour'>
@@ -3407,19 +4271,32 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{C2E034CB-5ACC-47F7-8438-A9327743CF33}' />
+    </window>
+    <window class='worksheet' maximized='true' name='Top 3 car_price L'>
+      <cards>
+        <edge name='left'>
+          <strip size='255'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{94654231-99DD-4334-A94F-B79A4FA8B0D8}' />
     </window>
     <window class='worksheet' name='Score distribution'>
       <cards>
         <edge name='left'>
-          <strip size='160'>
+          <strip size='270'>
             <card type='pages' />
             <card type='filters' />
             <card type='marks' />
@@ -3442,17 +4319,90 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 16 cars]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Calculation_1418915383070511105:nk]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:NumberofSeats:ok]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{420FE9D8-E26F-4EBA-916C-6CAE9E28E7A4}' />
+    </window>
+    <window class='worksheet' name='Sheet 23'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{DB3D2457-B46F-41DA-823D-C6CC53EC2784}' />
+    </window>
+    <window class='worksheet' name='High Avg Price'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{E5388C59-BE59-4803-8487-9EF19AE27EA1}' />
+    </window>
+    <window class='worksheet' name='High Avg Speed'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{FC49C169-DCAD-48E7-8313-105679AACE8F}' />
+    </window>
+    <window class='worksheet' name='High Avg Acceleration'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{A942D70A-AF84-4BFF-9199-9BC76F45553A}' />
     </window>
     <window class='worksheet' hidden='true' name='Average Acceleration'>
       <cards>
@@ -3572,16 +4522,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set 3]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[usr:Calculation_1267481844391346177:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{B5D32957-D71F-4187-96B3-2D7194E4E78A}' />
     </window>
     <window class='worksheet' hidden='true' name='The fastest car'>
@@ -3602,15 +4542,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The fastest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{223EEF96-3CEB-4A3C-8CD2-A9787C30DF97}' />
     </window>
     <window class='worksheet' hidden='true' name='The highest acceleration_car'>
@@ -3631,18 +4562,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Lowest Acceleration (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The fastest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{D9134D4E-0606-4DF0-A866-54773A0B2739}' />
     </window>
     <window class='worksheet' hidden='true' name='The highest capacity_car'>
@@ -3663,19 +4582,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Highest Range (copy 2)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Lowest Acceleration (copy 2)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The fastest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{2BF6E0D3-8BD3-4388-B06D-A0D5B1A797D3}' />
     </window>
     <window class='worksheet' hidden='true' name='The highest range_car'>
@@ -3696,18 +4602,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Lowest Acceleration (copy 2)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The fastest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{92DE6042-0F68-4B05-9033-D4412A15B3C2}' />
     </window>
     <window class='worksheet' hidden='true' name='The lowest acceleration_car'>
@@ -3728,17 +4622,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The fastest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{DBF87C61-93E4-4335-8654-F6237F87903E}' />
     </window>
     <window class='worksheet' hidden='true' name='The lowest capacity_car'>
@@ -3759,20 +4642,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Highest Capacity (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Highest Range (copy 2)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Lowest Acceleration (copy 2)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The fastest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{9115800F-3509-415A-B37F-6A4BD6882C2E}' />
     </window>
     <window class='worksheet' hidden='true' name='The lowest range_car'>
@@ -3793,19 +4662,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Highest Range (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Lowest Acceleration (copy 2)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The fastest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{E5D1CE5C-762E-4880-BA02-D3FC73CC1A1A}' />
     </window>
     <window class='worksheet' hidden='true' name='The most expensive car'>
@@ -3826,14 +4682,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{C29AB2A7-CEE5-4104-9C25-D6C3CF62990C}' />
     </window>
     <window class='worksheet' hidden='true' name='The slowest car'>
@@ -3854,16 +4702,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The fastest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[The slowest car]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{5E135BDE-30E3-4F8A-8FAE-A0F678336AE8}' />
     </window>
     <window class='worksheet' hidden='true' name='Top 3 car_acceleration'>
@@ -3884,21 +4722,9 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set 2]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3 acceleration_brand]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3_speed car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 5_price car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{0ED9E9F1-8644-449F-B509-5541EFFBC6D2}' />
     </window>
-    <window class='worksheet' hidden='true' name='Top 3 car_price'>
+    <window class='worksheet' hidden='true' name='Top 3 car_price H'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -3916,16 +4742,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set 2]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3 price_brands]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{97EE546F-9550-48CB-817B-51CFBCB0DF35}' />
     </window>
     <window class='worksheet' hidden='true' name='Top 3 car_range'>
@@ -3946,19 +4762,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set 2]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3 range_brand]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3_acceleration car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3_speed car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 5_price car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{758B828E-5833-40C6-89F0-BD429547603F}' />
     </window>
     <window class='worksheet' hidden='true' name='Top 3 car_speed'>
@@ -3979,17 +4782,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set 2]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3_speed brand]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 5_price car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{4E88C537-BE85-4E3A-AD40-E6020809BADB}' />
     </window>
     <window class='worksheet' hidden='true' name='Top 3 car_subtitle'>
@@ -4010,362 +4802,7 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Name Set 2]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3 subtitle_brand]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3_acceleration car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3_speed car (copy 2)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 3_speed car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[Top 5_price car (copy)]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Brand:nk]</field>
-            <field>[federated.1gocl1t1wmtbiq1h8a2lv00la0ta].[none:Name:nk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{63096FBD-CCE3-4D11-A223-AB2137C5DC96}' />
     </window>
   </windows>
-  <thumbnails>
-    <thumbnail height='192' name='Dashboard 1' width='192'>
-      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
-      KgCVZc3/D2sX27EqHRD7AAAAAElFTkSuQmCC
-    </thumbnail>
-    <thumbnail height='192' name='Score distribution' width='192'>
-      iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAA7DAAAOwwHHb6hk
-      AAAIuUlEQVR4nO3dXW8T6RmH8f84xkkMOE1w3myIE0gRpCRoD4BW20UUlQhVFUgcVT3c/Sb7
-      MSrOetKDSitBqchqWy3hRdBuoARaYCsShwSMQ0xJnIQkjj09WIJWeGFtk/EY39fvjAeN5xbo
-      0jPj2BPHdV1XgFEBvwcA/EQAMI0AYBoBwDQCgGkEANMIAKYRAEwjAJhGADCNAGAaAcA0AoBp
-      BADTgm/7C9d1dePGDbW3t+vBgwfq7e1VNpvVkSNHqjkf4Km37gCO4ygejyuTyai1tVXxeFxL
-      S0vVnA3w3Dt3gGQyqbW1NaVSKT179kzRaLSaswGec/hGGCx7502w67r65ptv5Lqubt68Wa2Z
-      gKr50XeBFhcXNTU1pZmZGbFZoN68MwDHcdTd3a2mpiatrq5qfX29WnMBVcE9AEx767tAqUxW
-      X41NFq1/9NMuHejr8HQooFreGsDs/5b056//U7TeHAoSAOoGH4WAaQQA0wgAphEATCMAmEYA
-      MI0AYBoBwDQCgGkEANMIAKYRAEwjAJhGADCNAGAaAcA0AoBpBADTCACmEQBMIwCYRgAwjQBg
-      GgHANAKAaQQA0wgAphEATCMAmEYAMI0AYBoBwDQCgGkEANMIAKYRAEwjAJhGADCNAGAaAcA0
-      AoBpBADTCACmEQBMIwCYRgAwjQBgGgHANAKAaQQA04JevKjrurp27Zq2bt2qyclJDQ4Oanx8
-      XGfOnPHidEDFPNsBmpubtbi4qHv37qmxsVH9/f1enQqomCcBFAoFzc7OKpFI6LPPPtOWLVs0
-      MDDgxamA9+LJJVBDQ4NOnjzpxUsDm8qzS6BCoaDz588rlUrpwoULXp0GeC+eBRAIBNTZ2am2
-      tjatra3JdV2vTgVUzNO3QROJhDKZjGKxmJenASrmyT3Ahs7OTkkiANQsTwK4OzGrP5wfK1o/
-      c3S/jn3U68UpgYp4EsDyak5T6fmi9YXlVS9OB1SMj0LANAKAaQQA0wgAphEATCMAmEYAMI0A
-      YBoBwDQCgGkEANMIAKYRAEwjAJhGADCNAGAaAcA0AoBpnn4pvhKu6+ry5csKh8Oam5tTX1+f
-      Hj16pBMnTvg9GupQzQUgSU1NTerp6ZHrugqHw2pvb/d7JNSpmrsEyufzevHihXK5nBKJhJ4+
-      fer3SKhjNbcDBINBDQ8Pv/5zR0eHj9Og3tXcDiB991zRc+fOaXx8XOfOnVOhUPB7JNSpmgwg
-      EAioq6tLy8vLisViyuVyfo+EOlVzl0Abent7FQgElEwmFQqF/B4HdapmA9i49o9Goz5PgnpW
-      cwGMfZvS2b/cLFr//a8P6JOhhA8ToZ7VXAAvV3N6MpctWl9a4T4Am68mb4KBaiEAmEYAMI0A
-      YBoBwDQCgGkEANMIAKYRAEwjAJhGADCNAGAaAcA0AoBpBADTCACmEQBMIwCYRgAwjQBgGgHA
-      NAKAaQQA02ruuUDvK5lMKhwO6+7du+rp6ZEk9ff3+zwValVd7QCu62piYkKRSEShUEjpdFrp
-      dNrvsVDD6ioAx3HU3d2tly9fKhKJKJ/Pa2Vlxe+xUMPq7hJo//79kqTW1lafJ8GHoK52gA3Z
-      bFY3btzgF2vgR9VlAI8fP9atW7eUzRY/ZBf4vrq7BJKkvXv3KpPJKBKJ+D0KalxdBhAIBPTx
-      xx/7PQY+AHUVwL2pZ/rynw+L1ocP7dH+BL9rGMXqKoBUZlF/v5ksWh/c3UkA+EF1eRMMlIoA
-      YBoBwDQCgGkEANPq6l2g9+G6rq5evap4PK7p6WnFYjE1NjZq165dfo8GD7EDfE9jY6PC4bDm
-      5ua0detWLS0t+T0SPMYO8IrjOOrs7FQul1NLS4u2b9/u90ioAgL4no1vkO3cuVOStG3bNj/H
-      QRVwCfSG2dlZjYyMKJ/Pl3yM67q6fPmy8vm8RkdHlUqlNDc35+GU2CzsAG/IZDJKpVJaX19X
-      Q0NDyceFQiHduXNHExMTmpyc1MDAgKLRqIeTYjMQwBu2b9+u7u5uBQKlb46O46irq0utra1a
-      XV2V4zgKBkv/p11aWlI4HNbi4qJyuZyampoUDocrGR9lIoA37Ny58/U9QDkSiYQk6ciRI2Ud
-      57quLl68qOPHj2tkZEQHDx5UOp3WsWPHyp4B5SOAV8YfpvXV2ETR+m9/sVd7d+0o6TXS6bSu
-      XbumU6dOlXz55DiOEomEpqamND8/r5WVFeVyubJmR+UI4JUnmawu/WuqaP3w/njJAXR0dCga
-      jZZ1+SRJQ0ND2rJliwYGBrS8vKx9+/aVdJzrurp06ZKOHj2qK1euKBgMKhKJ6MCBA2Wd3zLe
-      BdpECwsL6u/vl+M4ZR0XCoW0sLCgx48fq6WlRc3NzWUdOzY2punpaTU0NPA96DKxA2yilpYW
-      tbS0VHRsMBjU+Pi4ent7Sz5m4zlIG+82ra+vV3x+qwhgE9z8NqWvbyWL1k9/sk97YqU9nyif
-      z6unp6fs3aOvr0+SdOjQobKOw3cIYBPMPFvQpdvF9w+/HOopOYDm5mYNDQ1Vdv6ZGY2Njen0
-      6dMVHW8ZAfgsu7yq7PJa0fqOSLMaQ6X998RiMSWTyU2ezAYC8NnIPx7qj1+OF61//ukxHezv
-      Kuk1nj9//vqRkCgPAdQBPnJROQL4gF29O63r/54pWv/d8Z8p3s5T8UpBAB+wqacvNPoDN9+/
-      +Xm/4j7M8yHiB2EwjQBgGgHANAKAaQQA0wgAphEATCMAmEYAMI0AYBoBGFUoFPTFF19odnZW
-      o6OjOnv2rB4+LP79avWOAIwKBAKKx+OKRqMKh8MaHh7W9PS032NVHQEYtmfPHjmOo927d2t+
-      fl6Dg4N+j1R1fBrUsB07vnvcS1tbm9ra2nyexh/sAMY9f/5ct2/f9nsM3xCAcdevX9f9+/f9
-      HsM3XAIZd/jwYT158sTvMXxDAMZFo1HT3ykmAKP+9Le7+uv1/xatf/7pr9Tb/RMfJvIHARi1
-      srau+aXVovV8oeDDNP7hJhimEQBM+z/CDBVyHmBbWwAAAABJRU5ErkJggg==
-    </thumbnail>
-    <thumbnail height='192' name='Test colour' width='192'>
-      iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAA7DAAAOwwHHb6hk
-      AAAFvElEQVR4nO3YS2+cZx2G8WvOHp+PaaI4CXFxWps0KWmrRCQKNBuqAqqgggWIRdbwJeA7
-      sIcFldiAlAVUQgWRhjqtJSc+ND7E9Sk+xHYcB6LUkEYJi0EuYsuiQvf1272aefU883/eSzOa
-      wrNnz54hhSp+0RuQvkgGoGjl/7yYXNhkanGbAvCDS8P8fPodAC71nabl9hNujk5SLBa4/NMf
-      wdJfGjd1DTC194DZrWmKhSJvvfQ217euAnCsdYDa7jq7mzcpFssMnL7M483fA1BqG2Z8t8rM
-      5l0qpRLfO/0yI0sLAAz09NK9uMLj+XkKlQrt33oTJscb6/UfYXb7Hqsry1SqVc5f/DpL83MA
-      9D53kOLG39m7s02hWqb34ime3rkHQKGnja21HR6s3adcK3P87IvszGwA0Ha4i+27c+ysLVNp
-      qjN07nV2l2YBaD3Qz/jaIxY2HtDSVOGNs4Pc2voUgKOdNdrWr/J0e5ZCUzvVk2/D6vXGPvuG
-      +GhnkTsPlmmttnJx8BI3dj4E4ETHME/WJ3i4O0+1qZMjL3ybz7b/3DiQzlf4YH2Pld37dNTr
-      vD54grHVFQCGnjtEfWKSJ2vrFDs6aLvwNZiZbqx3/HnGFxa4t7VJa3s7L585w+rSIgAH+4/w
-      2dwGj7f/Rrm9ma4zJ3i6cR+A4oFOVufWeLTzkHp7M8deG/yfHqj/N/8VwBa/+dPHFArw/UtD
-      /Gz61403FUocGNnjV794h3K5xOWf/BCWGgdGscTUzhJXpn5LpVThOye/y8jmvw+zUKZ9dZTF
-      iV9SKtcZOPVj/nn3CgC1Yo2x1VZ+N3GT5kqFt146xbXF+cZr5TLN4+M8/MO7FFtaaH/jm3Bj
-      rLFercbc9Awj196nuaWFc+cvsDDbeAiqtRql6VXuf/AxpdY6vedP8nRpq7HNapm7M6ssj96m
-      1lbn2JlBtqfWAKg0V1m5dZO50au0dHTxwqsXuHd7qvEZmlr48NY2740t0tfZzKVXv8z4+iMA
-      Wqsl6vPv8WT6CoWOfqovvvn5XOrdjK6M8NfFqxxsO8RrA+f259Jd6+Efi39k45N3aek8Tv/z
-      39ifS7HpEO8v7HBt4ROOdnVz9tiX9ufS19pGz8h19j4apXL0KG2vfPXzuXT3MHFjjOmpSQ4d
-      PszQ8PD+XNo7O/n0xm0e3lqmqb+Pzq8c359Loa3O6vgiW3NrdPX3xgXgTyBFK/gvkJL5DaBo
-      BqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBo
-      BqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBo
-      BqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBo
-      BqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBo
-      BqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBo
-      BqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBo
-      BqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBo
-      BqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBo
-      BqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBo
-      BqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBoBqBo
-      BqBoBqBoBqBoBqBo/wKAqDjZtFNVKwAAAABJRU5ErkJggg==
-    </thumbnail>
-  </thumbnails>
 </workbook>

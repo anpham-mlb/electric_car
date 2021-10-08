@@ -144,6 +144,9 @@ duplicated_data = df[df["Name"].isin([
     "Tesla Model 3 Long Range Dual Motor", "Audi e-tron 55 quattro", "Kia e-Soul 64 kWh"])].index.tolist()
 df = df.drop(duplicated_data, axis = 0)
 
+# Remove null data
+df = df.dropna()
+
 # print(duplicated_data)
 # print(df["Name"].value_counts().iloc[0:6])
-# df.to_csv("clean_electricity_car.csv", index = False)
+df.to_csv("clean_electricity_car.csv", index = False)
